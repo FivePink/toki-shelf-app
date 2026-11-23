@@ -7,22 +7,28 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { TabIcon } from '../icons';
-import { DIMS, type TabId, type ThemeTokens } from '../tokens';
+import { ShelfSlot } from '../shelf/ShelfSlot';
+import type { ShelfRuntime } from '../shelf/contract';
+import type { ShelfLayout } from '../shelf/layout';
+import type { ShelfTheme } from '../shelf/theme';
 
 export function ChatPane({
   theme,
+  layout,
+  runtime,
   safeBottom,
-  selectedTab,
   onBack,
   showBack,
+  backIcon,
   style,
 }: {
-  theme: ThemeTokens;
+  theme: ShelfTheme;
+  layout: ShelfLayout;
+  runtime: ShelfRuntime;
   safeBottom: number;
-  selectedTab: TabId;
   onBack: () => void;
   showBack: boolean;
+  backIcon: React.ReactNode;
   style?: StyleProp<ViewStyle>;
 }) {
   return (
@@ -30,7 +36,12 @@ export function ChatPane({
       testID="chatPane"
       style={[styles.pane, { backgroundColor: theme.chatBg }, style]}
     >
-      <View testID="chatContentSlot" style={styles.slot} />
+      <ShelfSlot
+        runtime={runtime}
+        slot="chatContentSlot"
+        testID="chatContentSlot"
+        style={styles.slot}
+      />
       {showBack ? (
         <Pressable
           testID="chatBack"
@@ -40,20 +51,18 @@ export function ChatPane({
           style={({ pressed }) => [
             styles.back,
             {
-              left: DIMS.inset,
-              bottom: DIMS.bottomGap + safeBottom,
+              left: layout.inset,
+              bottom: layout.bottomGap + safeBottom,
+              width: layout.control,
+              height: layout.control,
+              borderRadius: layout.radius,
               backgroundColor: theme.chatButtonBg,
               shadowColor: theme.shadowColor,
             },
             pressed && styles.pressed,
           ]}
         >
-          <TabIcon
-            id={selectedTab}
-            selected
-            color={theme.chatButtonInk}
-            size={DIMS.iconBox}
-          />
+          {backIcon}
         </Pressable>
       ) : null}
     </View>
@@ -69,9 +78,6 @@ const styles = StyleSheet.create({
   },
   back: {
     position: 'absolute',
-    width: DIMS.control,
-    height: DIMS.control,
-    borderRadius: DIMS.radius,
     alignItems: 'center',
     justifyContent: 'center',
     shadowOpacity: 1,

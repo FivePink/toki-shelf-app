@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, PanResponder, StyleSheet, View } from 'react-native';
 
-import { PAGER, type ThemeTokens } from '../tokens';
+import type { ShelfPagerConfig } from '../shelf/layout';
+import type { ShelfTheme } from '../shelf/theme';
 
 type Page = 0 | 1;
 
@@ -9,13 +10,15 @@ export function HomePager({
   page,
   width,
   theme,
+  pager,
   onPageChange,
   home,
   chat,
 }: {
   page: Page;
   width: number;
-  theme: ThemeTokens;
+  theme: ShelfTheme;
+  pager: ShelfPagerConfig;
   onPageChange: (page: Page) => void;
   home: React.ReactNode;
   chat: React.ReactNode;
@@ -53,7 +56,7 @@ export function HomePager({
     pageRef.current = target;
     const animation = Animated.spring(offset, {
       toValue: target,
-      ...PAGER.spring,
+      ...pager.spring,
       useNativeDriver: true,
     });
     spring.current = animation;
@@ -80,7 +83,7 @@ export function HomePager({
         Math.max(
           0,
           offsetRef.current -
-            (velocity.current * PAGER.momentumSeconds * 1000) / w,
+            (velocity.current * pager.momentumSeconds * 1000) / w,
         ),
       );
       const target: Page = Math.abs(projected) < Math.abs(projected - 1) ? 0 : 1;
@@ -105,20 +108,20 @@ export function HomePager({
         const dy = gesture.moveY - start.y;
         const onEdge =
           fromPage === 0
-            ? start.x >= w - PAGER.edgeSwipeWidth
-            : start.x <= PAGER.edgeSwipeWidth;
+            ? start.x >= w - pager.edgeSwipeWidth
+            : start.x <= pager.edgeSwipeWidth;
         if (!onEdge) return false;
         if (fromPage === 0 && dx > 0) return false;
         if (fromPage === 1 && dx < 0) return false;
         if (
-          Math.abs(dy) >= PAGER.directionLockY &&
+          Math.abs(dy) >= pager.directionLockY &&
           Math.abs(dy) > Math.abs(dx)
         ) {
           return false;
         }
         return (
-          Math.abs(dx) >= PAGER.activationX &&
-          Math.abs(dx) > Math.abs(dy) * PAGER.directionRatio
+          Math.abs(dx) >= pager.activationX &&
+          Math.abs(dx) > Math.abs(dy) * pager.directionRatio
         );
       },
       onPanResponderGrant: (_, gesture) => {
@@ -151,7 +154,7 @@ export function HomePager({
       onPanResponderTerminationRequest: () => false,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pager]);
 
   const w = Math.max(width, 1);
   const homeTranslate = offset.interpolate({

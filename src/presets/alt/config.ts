@@ -1,0 +1,63 @@
+import type { ShelfPreset } from '../../shelf/preset';
+import type { TabId } from '../../toki/config';
+
+export const ALT_PRESET: ShelfPreset<TabId> = {
+  layout: {
+    inset: 24,
+    control: 56,
+    gap: 10,
+    bottomGap: 12,
+    radius: 20,
+    tabRadius: 16,
+    tabPadding: 5,
+    iconBox: 24,
+    segmentedMax: 270,
+    wideMin: 820,
+    wideChatPane: 360,
+    divider: 2,
+  },
+  pager: {
+    edgeSwipeWidth: 48,
+    directionLockY: 10,
+    activationX: 12,
+    directionRatio: 1.1,
+    momentumSeconds: 0.25,
+    spring: {
+      damping: 30,
+      mass: 1,
+      stiffness: 300,
+      overshootClamping: true,
+    },
+  },
+  light: {
+    bg: '#F3F0E8',
+    surface: '#FFFDF8',
+    ink: '#27231D',
+    muted: '#8B8578',
+    line: '#D9D2C3',
+    tabbar: '#FFFDF8',
+    tabSelected: '#E9E2D3',
+    chatBg: '#F3F0E8',
+    chatButtonBg: '#27231D',
+    chatButtonInk: '#FFFDF8',
+    shadowColor: 'rgba(39,35,29,0.18)',
+  },
+  dark: {
+    bg: '#1B1A17',
+    surface: '#2A2722',
+    ink: '#F4EFE6',
+    muted: '#A8A092',
+    line: '#454038',
+    tabbar: '#2A2722',
+    tabSelected: '#3D3932',
+    chatBg: '#23211D',
+    chatButtonBg: '#F4EFE6',
+    chatButtonInk: '#1B1A17',
+    shadowColor: 'rgba(0,0,0,0.45)',
+  },
+  tabs: [
+    { id: 'calendar', label: '日程', accessibilityLabel: '日程' },
+    { id: 'todo', label: '清单', accessibilityLabel: '清单' },
+    { id: 'trigger', label: '触发', accessibilityLabel: '触发' },
+  ],
+};

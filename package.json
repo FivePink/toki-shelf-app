@@ -20,6 +20,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "check:contract": "node --no-warnings --experimental-strip-types scripts/check-shelf-contract.mjs",
+    "check:presets": "node --no-warnings --experimental-strip-types scripts/check-presets.mjs",
     "typecheck": "tsc --noEmit"
   },
   "private": true

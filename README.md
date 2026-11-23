@@ -2,6 +2,15 @@
 
 TOKI 底部外壳的 Expo Go 版本。只包含已经证明过的界面与手势，不包含日历、To-do、Trigger 的业务内容，也不包含真实聊天协议。
 
+可复用层的说明：
+
+- `docs/SHELF_CONTRACT.md`：货架与管线的 v1 契约
+- `docs/CASE_TEMPLATE.md`：新 App 的解剖与证据模板
+- `docs/REUSE_MAP.md`：哪些东西值得复用、哪些只是 TOKI 专用
+
+TOKI 的布局、主题、翻页参数和 Tab 配置集中在 `src/toki/config.ts`；
+货架组件本身只接收 `layout`、`theme`、`pager`。
+
 ## 运行
 
 ```powershell
@@ -18,6 +27,23 @@ D:\SoftInstall\platform-tools\adb.exe shell am start -a android.intent.action.VI
 
 手机上用 Expo Go 打开。改代码后 Metro 会热更新。
 
+用第二套 `Paper Compact` 预设启动：
+
+```powershell
+$env:EXPO_PUBLIC_SHELF_PRESET = "alt"
+npx expo start --localhost --port 8082
+```
+
+不设置这个变量时，默认使用 TOKI 预设。
+
+验证契约层：
+
+```powershell
+npm run check:contract
+npm run check:presets
+npm run typecheck
+```
+
 ## 组件
 
 | 中文名 | 代码名 | 文件 |
@@ -28,8 +54,9 @@ D:\SoftInstall\platform-tools\adb.exe shell am start -a android.intent.action.VI
 | 聊天圆钮 | `chatFab` | `src/components/ChatFab.tsx` |
 | 聊天页 | `chatPane` | `src/components/ChatPane.tsx` |
 | 聊天页返回圆钮 | `chatBack` | 同上 |
-| 首页内容槽 | `contentSlot` | `App.tsx` |
-| 聊天内容槽 | `chatContentSlot` | `ChatPane.tsx` |
+| 货架运行时 | `ShelfRuntime` | `src/shelf/contract.ts` |
+| 首页内容槽 | `contentSlot` / `ShelfSlot` | `App.tsx` |
+| 聊天内容槽 | `chatContentSlot` / `ShelfSlot` | `ChatPane.tsx` |
 | Tab 图标 | `TabIcon` | `src/icons.tsx` |
 
 聊天圆钮使用 `assets/icons/chat-entry.png`（用户提供的 icons8 inbox 96×96 PNG），运行时按主题染色。

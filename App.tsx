@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -14,45 +14,107 @@ import {
 import { BottomTabBar } from './src/components/BottomTabBar';
 import { ChatPane } from './src/components/ChatPane';
 import { HomePager } from './src/components/HomePager';
-import {
-  DIMS,
-  darkTheme,
-  lightTheme,
-  type TabId,
-  type ThemeTokens,
-} from './src/tokens';
+import { ChatEntryIcon, TabIcon } from './src/icons';
+import { ACTIVE_PRESET } from './src/config';
+import { ShelfRuntime } from './src/shelf/contract';
+import { ShelfSlot } from './src/shelf/ShelfSlot';
+import type { TabId } from './src/toki/config';
+import type { ShelfTheme } from './src/shelf/theme';
 
 type Page = 0 | 1;
 
 function Shelf() {
   const scheme = useColorScheme();
-  const theme: ThemeTokens = scheme === 'dark' ? darkTheme : lightTheme;
+  const { layout, pager, light, dark, tabs } = ACTIVE_PRESET;
+  const theme: ShelfTheme =
+    scheme === 'dark' ? dark : light;
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const [tab, setTab] = useState<TabId>('calendar');
   const [page, setPage] = useState<Page>(0);
-  const wide = width >= DIMS.wideMin;
+  const wide = width >= layout.wideMin;
+  const shelf = useMemo(() => new ShelfRuntime(), []);
+  const tabRef = useRef(tab);
+  const previousPage = useRef<Page>(page);
+
+  useEffect(() => {
+    tabRef.current = tab;
+  }, [tab]);
+
+  useEffect(() => {
+    shelf.emit({
+      type: 'theme.change',
+      mode: scheme === 'dark' ? 'dark' : 'light',
+    });
+  }, [scheme, shelf]);
+
+  useEffect(() => {
+    if (previousPage.current === page) return;
+    previousPage.current = page;
+    if (page === 1) {
+      shelf.emit({ type: 'chat.open', fromTabId: tabRef.current });
+    } else {
+      shelf.emit({ type: 'chat.close', toTabId: tabRef.current });
+    }
+  }, [page, shelf]);
+
+  const selectTab = (next: TabId) => {
+    if (next === tab) return;
+    shelf.emit({ type: 'tab.select', tabId: next, previousTabId: tab });
+    setTab(next);
+  };
+
+  const renderTabIcon = (id: TabId, selected: boolean) => (
+    <TabIcon
+      id={id}
+      selected={selected}
+      color={theme.ink}
+      size={layout.iconBox}
+    />
+  );
+
+  const chatIcon = <ChatEntryIcon color={theme.ink} size={layout.iconBox - 2} />;
+
+  const backIcon = (
+    <TabIcon
+      id={tab}
+      selected
+      color={theme.chatButtonInk}
+      size={layout.iconBox}
+    />
+  );
 
   if (wide) {
     return (
       <View style={[styles.wideRoot, { backgroundColor: theme.bg }]}>
-        <View style={{ width: DIMS.wideChatPane }}>
+        <View style={{ width: layout.wideChatPane }}>
           <ChatPane
             theme={theme}
+            layout={layout}
+            runtime={shelf}
             safeBottom={insets.bottom}
-            selectedTab={tab}
             onBack={() => setPage(0)}
             showBack={false}
+            backIcon={backIcon}
           />
         </View>
-        <View style={{ width: DIMS.divider, backgroundColor: theme.line }} />
+        <View style={{ width: layout.divider, backgroundColor: theme.line }} />
         <View style={[styles.page, { backgroundColor: theme.bg }]}>
-          <View testID="contentSlot" style={styles.slot} />
+          <ShelfSlot
+            runtime={shelf}
+            slot="contentSlot"
+            testID="contentSlot"
+            style={styles.slot}
+          />
           <BottomTabBar
+            items={tabs}
             selected={tab}
-            onSelect={setTab}
+            onSelect={selectTab}
             onChatOpen={() => setPage(1)}
+            renderIcon={renderTabIcon}
+            chatIcon={chatIcon}
             theme={theme}
+            layout={layout}
             safeBottom={insets.bottom}
             showChatFab={false}
           />
@@ -68,15 +130,25 @@ function Shelf() {
         page={page}
         width={width}
         theme={theme}
+        pager={pager}
         onPageChange={setPage}
         home={
           <View style={[styles.page, { backgroundColor: theme.bg }]}>
-            <View testID="contentSlot" style={styles.slot} />
+            <ShelfSlot
+              runtime={shelf}
+              slot="contentSlot"
+              testID="contentSlot"
+              style={styles.slot}
+            />
             <BottomTabBar
+              items={tabs}
               selected={tab}
-              onSelect={setTab}
+              onSelect={selectTab}
               onChatOpen={() => setPage(1)}
+              renderIcon={renderTabIcon}
+              chatIcon={chatIcon}
               theme={theme}
+              layout={layout}
               safeBottom={insets.bottom}
               showChatFab
             />
@@ -85,10 +157,12 @@ function Shelf() {
         chat={
           <ChatPane
             theme={theme}
+            layout={layout}
+            runtime={shelf}
             safeBottom={insets.bottom}
-            selectedTab={tab}
             onBack={() => setPage(0)}
             showBack
+            backIcon={backIcon}
           />
         }
       />

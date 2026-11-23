@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, type ImageStyle, type StyleProp } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 
-import type { TabId } from './tokens';
+import type { TabId } from './toki/config';
 
 const SVG: Record<TabId, { regular: string; solid: string }> = {
   calendar: {

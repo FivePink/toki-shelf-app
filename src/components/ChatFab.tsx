@@ -1,15 +1,19 @@
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 
-import { ChatEntryIcon } from '../icons';
-import { DIMS, type ThemeTokens } from '../tokens';
+import type { ShelfLayout } from '../shelf/layout';
+import type { ShelfTheme } from '../shelf/theme';
 
 export function ChatFab({
   theme,
+  layout,
   onPress,
+  icon,
 }: {
-  theme: ThemeTokens;
+  theme: ShelfTheme;
+  layout: ShelfLayout;
   onPress: () => void;
+  icon: React.ReactNode;
 }) {
   return (
     <Pressable
@@ -20,22 +24,22 @@ export function ChatFab({
       style={({ pressed }) => [
         styles.fab,
         {
+          width: layout.control,
+          height: layout.control,
+          borderRadius: layout.radius,
           backgroundColor: theme.tabbar,
           shadowColor: theme.shadowColor,
         },
         pressed && styles.pressed,
       ]}
     >
-      <ChatEntryIcon color={theme.ink} size={26} />
+      {icon}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   fab: {
-    width: DIMS.control,
-    height: DIMS.control,
-    borderRadius: DIMS.radius,
     alignItems: 'center',
     justifyContent: 'center',
     shadowOpacity: 1,
