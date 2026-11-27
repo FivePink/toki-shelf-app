@@ -22,6 +22,7 @@
     "web": "expo start --web",
     "check:contract": "node --no-warnings --experimental-strip-types scripts/check-shelf-contract.mjs",
     "check:presets": "node --no-warnings --experimental-strip-types scripts/check-presets.mjs",
+    "check:content": "node --no-warnings --experimental-strip-types scripts/check-content-flow.mjs",
     "typecheck": "tsc --noEmit"
   },
   "private": true

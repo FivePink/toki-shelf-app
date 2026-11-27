@@ -17,7 +17,10 @@ import { HomePager } from './src/components/HomePager';
 import { ChatEntryIcon, TabIcon } from './src/icons';
 import { ACTIVE_PRESET } from './src/config';
 import { ShelfRuntime } from './src/shelf/contract';
+import type { ShelfContentPackage } from './src/shelf/contract';
 import { ShelfSlot } from './src/shelf/ShelfSlot';
+import { attachContentController, DEMO_SLOT } from './src/shelf/demo/contentController';
+import { ContentSlotView } from './src/shelf/demo/ContentSlotView';
 import type { TabId } from './src/toki/config';
 import type { ShelfTheme } from './src/shelf/theme';
 
@@ -36,6 +39,9 @@ function Shelf() {
   const shelf = useMemo(() => new ShelfRuntime(), []);
   const tabRef = useRef(tab);
   const previousPage = useRef<Page>(page);
+
+  // 演示内容管线接管 contentSlot；外壳只把动作回传成事件，不解析内容。
+  useEffect(() => attachContentController(shelf), [shelf]);
 
   useEffect(() => {
     tabRef.current = tab;
@@ -75,6 +81,22 @@ function Shelf() {
 
   const chatIcon = <ChatEntryIcon color={theme.ink} size={layout.iconBox - 2} />;
 
+  const renderContent = (content: ShelfContentPackage | null) => (
+    <ContentSlotView
+      content={content}
+      theme={theme}
+      layout={layout}
+      onAction={(actionId, contentId) =>
+        shelf.emit({
+          type: 'action.invoke',
+          slot: DEMO_SLOT,
+          actionId,
+          contentId,
+        })
+      }
+    />
+  );
+
   const backIcon = (
     <TabIcon
       id={tab}
@@ -104,6 +126,7 @@ function Shelf() {
             runtime={shelf}
             slot="contentSlot"
             testID="contentSlot"
+            renderContent={renderContent}
             style={styles.slot}
           />
           <BottomTabBar
@@ -138,6 +161,7 @@ function Shelf() {
               runtime={shelf}
               slot="contentSlot"
               testID="contentSlot"
+              renderContent={renderContent}
               style={styles.slot}
             />
             <BottomTabBar
