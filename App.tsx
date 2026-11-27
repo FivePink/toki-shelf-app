@@ -21,6 +21,7 @@ import type { ShelfContentPackage } from './src/shelf/contract';
 import { ShelfSlot } from './src/shelf/ShelfSlot';
 import { attachContentController, DEMO_SLOT } from './src/shelf/demo/contentController';
 import { ContentSlotView } from './src/shelf/demo/ContentSlotView';
+import { ENABLE_DEMO_CONTENT } from './src/shelf/demo/config';
 import type { TabId } from './src/toki/config';
 import type { ShelfTheme } from './src/shelf/theme';
 
@@ -41,7 +42,11 @@ function Shelf() {
   const previousPage = useRef<Page>(page);
 
   // 演示内容管线接管 contentSlot；外壳只把动作回传成事件，不解析内容。
-  useEffect(() => attachContentController(shelf), [shelf]);
+  // 默认关闭（见 demo/config.ts）：只保留底栏，内容槽留空。
+  useEffect(() => {
+    if (!ENABLE_DEMO_CONTENT) return;
+    return attachContentController(shelf);
+  }, [shelf]);
 
   useEffect(() => {
     tabRef.current = tab;
@@ -97,6 +102,8 @@ function Shelf() {
     />
   );
 
+  const contentRenderer = ENABLE_DEMO_CONTENT ? renderContent : undefined;
+
   const backIcon = (
     <TabIcon
       id={tab}
@@ -126,7 +133,7 @@ function Shelf() {
             runtime={shelf}
             slot="contentSlot"
             testID="contentSlot"
-            renderContent={renderContent}
+            renderContent={contentRenderer}
             style={styles.slot}
           />
           <BottomTabBar
@@ -161,7 +168,7 @@ function Shelf() {
               runtime={shelf}
               slot="contentSlot"
               testID="contentSlot"
-              renderContent={renderContent}
+              renderContent={contentRenderer}
               style={styles.slot}
             />
             <BottomTabBar
