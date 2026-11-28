@@ -37,6 +37,7 @@ export function BottomTabBar<T extends string>({
           gap: layout.gap,
           paddingHorizontal: layout.inset,
           paddingBottom: layout.bottomGap + safeBottom,
+          maxWidth: layout.rowMax,
         },
       ]}
     >
@@ -92,6 +93,9 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+    // 窄屏时 width 100% 等于原来的 stretch；宽于 rowMax 时整行居中，控件不再横跨整屏。
+    width: '100%',
+    alignSelf: 'center',
   },
   group: {
     flex: 1,

@@ -17,6 +17,8 @@ export const TOKI_LAYOUT: ShelfLayout = {
   wideMin: 850,
   wideChatPane: 390,
   divider: 1,
+  // 设计选择，不是原版证据：底栏整行最多 600dp，超出部分留白居中。
+  rowMax: 600,
 };
 
 export const TOKI_PAGER: ShelfPagerConfig = {

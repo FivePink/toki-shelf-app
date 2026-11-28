@@ -15,6 +15,7 @@ export const ALT_PRESET: ShelfPreset<TabId> = {
     wideMin: 820,
     wideChatPane: 360,
     divider: 2,
+    rowMax: 600,
   },
   pager: {
     edgeSwipeWidth: 48,
